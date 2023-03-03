@@ -206,8 +206,8 @@ class Bot:
             response_list = response['response']
             for i in response_list:
                 print(i.get('home_town'))
-                date_relation = i.get('home_town')
-                return date_relation
+                home_town = i.get('home_town')
+                return home_town
             else:
                 write_msg(user_id,'Введите название своего города')
                 for event in longpoll.listen():
