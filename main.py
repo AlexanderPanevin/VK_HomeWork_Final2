@@ -79,6 +79,7 @@ class Bot:
 
     @staticmethod
     def age_from_persone():
+        global age_from
         user_info_url = url + 'users.get'
         user_params = {
             'user_ids': user_id,
@@ -108,7 +109,7 @@ class Bot:
                                 try:
                                     age_from = int(request)
                                     if int(request) > 17:
-                                        pass
+                                        return age_from
                                     else:
                                         write_msg(event.user_id,
                                                   'Действует ограничение "не моложе 18 лет", введите другое значение возраста')
@@ -117,8 +118,6 @@ class Bot:
                                     write_msg(event.user_id, 'Неправильный ввод, надо  выбрать ЦИФРУ от 18 и больше')
                                     print('ошибка ввода цифры')
                                     break
-                                else:
-                                    return age_from
         except Exception as err:
                 print(f'Другая ошибка: {err}')
 
@@ -150,8 +149,8 @@ class Bot:
                                 request = event.text.lower()
                                 try:
                                     age_to = int(request)
-                                    if age_to > int(Bot.age_from_persone()):
-                                        pass
+                                    if age_to > int(age_from):
+                                        return age_to
                                     else:
                                         write_msg(event.user_id,
                                                   'Значение верхней границы возраста должно быть больше выбранной нижней границы')
@@ -161,8 +160,6 @@ class Bot:
                                               'Неправильный ввод, надо  выбрать ЦИФРУ от 18 и больше')
                                     print('ошибка ввода цифры')
                                     break
-                                else:
-                                    return age_to
         except Exception as err:
             print(f'Другая ошибка: {err}')
 
