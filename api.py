@@ -48,8 +48,8 @@ class Handler:
                     'sex': sex,
                     'age_from': age_from,
                     'age_to': age_to,
-                    'relation': relation,
-                    'home_town': home_town
+                    'status': relation,
+                    'hometown': home_town
                 }
                 response = requests.get(users_search_url, params={**self.params, **user_params}).json()
                 if 'error' in response and response['error'].get('error_code') == 6:
@@ -62,6 +62,8 @@ class Handler:
                     print(f'Type_Error: {type_err}')
                 except HTTPError as http_err:
                     print(f'HTTP-ошибка: {http_err}')
+                except KeyError as key_err:
+                    print(f'KeyError: {key_err}')
                 except Exception as err:
                     print(f'Другая ошибка: {err}')
                 else:
@@ -75,7 +77,7 @@ class Handler:
         user_info_url = self.url + 'users.get'
         user_params = {
             'user_ids': persone_id,
-            'fields': 'sex, bdate, relation, home_town',
+            'fields': 'sex, bdate, relation, city, home_town',
             'name_case': 'nom'
         }
         response = requests.get(user_info_url, params={**self.params, **user_params}).json()
@@ -85,6 +87,8 @@ class Handler:
                 resp.raise_for_status()
             except HTTPError as http_err:
                 print(f'HTTP-ошибка: {http_err}')
+            except TypeError as type_err:
+                print(f'TypeError:{type_err}')
             except Exception as err:
                 print(f'Другая ошибка: {err}')
             else:
