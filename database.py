@@ -10,11 +10,14 @@ engine = sq.create_engine(DSN)
 connect = engine.connect()
 Session = sessionmaker(bind=engine)
 
+
 class DB_User(Base):
     __tablename__ = 'DB_user'
 
     id = sq.Column(sq.Integer, primary_key=True)
     name = sq.Column(sq.String(100), unique=True)
+    hometown = sq.Column(sq.String(50))
+    status = sq.Column(sq.Integer)
 
 Base.metadata.drop_all(engine)
 Base.metadata.create_all(engine)

@@ -37,7 +37,7 @@ class Handler:
                 print('Успешное соединение get_user')
         return respJS
 
-    def users_search(self, get_persone_info, sex, age_from, age_to, relation, home_town):
+    def users_search(self, get_persone_info, home_town, relation, sex, age_from, age_to):
         persone_id_list = []
         while True:
             for items in get_persone_info['response']:
@@ -45,11 +45,11 @@ class Handler:
                 user_params = {
                     'count': 20,
                     'has_photo': 1,
+                    'hometown': home_town,
+                    'status': relation,
                     'sex': sex,
                     'age_from': age_from,
-                    'age_to': age_to,
-                    'status': relation,
-                    'hometown': home_town
+                    'age_to': age_to
                 }
                 response = requests.get(users_search_url, params={**self.params, **user_params}).json()
                 if 'error' in response and response['error'].get('error_code') == 6:

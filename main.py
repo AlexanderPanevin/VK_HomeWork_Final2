@@ -296,7 +296,7 @@ if __name__ == '__main__':
                                 print(f'get_user_info, {get_user_info}')
                                 get_persone_info = vk_client.get_persone_info(event.user_id)
                                 print(f'get_persone_info, {get_persone_info}')
-                                users_search = vk_client.users_search(get_user_info, sex, age_from, age_to, status, hometown)
+                                users_search = vk_client.users_search(get_user_info, hometown, status, sex, age_from, age_to)
                                 print(f'users_search, {users_search}')
                                 persones_list = []
                                 while True:
@@ -308,7 +308,7 @@ if __name__ == '__main__':
                                             send_photo(event.user_id, f'Персона vk.com/id{persone_id}', get_attachments)
                                         except ApiError:
                                             print('Hет доступа к фото')
-                                        persones_data = DB_User(name=f'vk.com/id{persone_id}')
+                                        persones_data = DB_User(name=f'vk.com/id{persone_id}', hometown=hometown, status=status)
                                         with Session() as session:
                                             try:
                                                 session.add(persones_data)
