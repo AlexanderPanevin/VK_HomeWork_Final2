@@ -45,7 +45,8 @@ class Bot:
             'v': self.version
         }
 
-    def sex_persone(user_token):
+    @staticmethod
+    def sex_persone():
         user_info_url = url + 'users.get'
         user_params = {
             'user_ids': user_id,
@@ -82,7 +83,8 @@ class Bot:
                             else:
                                 return sex
 
-    def age_from_persone(user_token):
+    @staticmethod
+    def age_from_persone():
         user_info_url = url + 'users.get'
         user_params = {
             'user_ids': user_id,
@@ -126,7 +128,8 @@ class Bot:
         except Exception as err:
                 print(f'Другая ошибка: {err}')
 
-    def age_to_persone(user_token):
+    @staticmethod
+    def age_to_persone():
         user_info_url = url + 'users.get'
         user_params = {
             'user_ids': user_id,
@@ -153,7 +156,7 @@ class Bot:
                                 request = event.text.lower()
                                 try:
                                     age_to = int(request)
-                                    if age_to > int(Bot.age_from_persone(user_token)):
+                                    if age_to > int(Bot.age_from_persone()):
                                         pass
                                     else:
                                         write_msg(event.user_id,
@@ -170,7 +173,8 @@ class Bot:
             print(f'Другая ошибка: {err}')
 
 
-    def relat_persone(user_token):
+    @staticmethod
+    def relat_persone():
         user_info_url = url + 'users.get'
         user_params = {
             'user_ids': user_id,
@@ -192,7 +196,8 @@ class Bot:
         else:
             pass
 
-    def home_town (user_token):
+    @staticmethod
+    def home_town ():
         user_info_url = url + 'users.get'
         user_params = {
             'user_ids': user_id,
@@ -249,20 +254,20 @@ if __name__ == '__main__':
                                 write_msg(event.user_id, 'Нужно написать "да" или "нет"')
                                 break
                             elif request == 'да':
-                                Bot.sex_persone(user_token)
-                                sex = Bot.sex_persone(user_token)
-                                Bot.age_from_persone(user_token)
-                                age_from = Bot.age_from_persone(user_token)
-                                print(f'Диапазон поиска составит от {Bot.age_from_persone(user_token)}')
-                                Bot.age_to_persone(user_token)
-                                age_to = Bot.age_to_persone(user_token)
-                                print(f'до {Bot.age_to_persone(user_token)} лет')
-                                Bot.relat_persone(user_token)
-                                print(f'Семейное положение: {Bot.relat_persone(user_token)}')
-                                relation = Bot.relat_persone(user_token)
-                                Bot.home_town(user_token)
-                                print(f'{Bot.home_town(user_token)}')
-                                home_town = Bot.home_town(user_token)
+                                Bot.sex_persone()
+                                sex = Bot.sex_persone()
+                                Bot.age_from_persone()
+                                age_from = Bot.age_from_persone()
+                                print(f'Диапазон поиска составит от {Bot.age_from_persone()}')
+                                Bot.age_to_persone()
+                                age_to = Bot.age_to_persone()
+                                print(f'до {Bot.age_to_persone()} лет')
+                                Bot.relat_persone()
+                                print(f'Семейное положение: {Bot.relat_persone()}')
+                                relation = Bot.relat_persone()
+                                Bot.home_town()
+                                print(f'{Bot.home_town()}')
+                                home_town = Bot.home_town()
                                 write_msg(event.user_id, 'Результаты поиска')
                                 vk_client = Handler(bot_token, V)
                                 get_user_info = vk_client.get_user_info(event.user_id)
@@ -280,7 +285,7 @@ if __name__ == '__main__':
                                             print(get_pers_inf)
                                         except ApiError:
                                             print('Hет доступа к фото')
-                                        persones_data = DB_User(name=f'vk.com/id{persone_id}, home_down, bdate')
+                                        persones_data = DB_User(name=f'vk.com/id{persone_id}')
                                         with Session() as session:
                                             try:
                                                 session.add(persones_data)
