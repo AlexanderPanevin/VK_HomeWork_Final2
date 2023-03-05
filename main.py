@@ -12,30 +12,25 @@ from sqlalchemy.exc import IntegrityError
 from modules import send_photo
 from random import randrange
 import time
+
 vk = vk_api.VkApi(token=bot_token)
 longpoll = VkLongPoll(vk)
-
-def write_msg(user_id, message):
+def write_msg(message_user_id, message):
     try:
-        vk.method('messages.send', {'user_id': user_id, 'message': message, 'random_id': randrange(10 ** 7)})
+        vk.method('messages.send', {'user_id': message_user_id, 'message': message, 'random_id': randrange(10 ** 7)})
     except ApiError:
-        for event in longpoll.listen():
-                      write_msg(event.user_id,'К сожалению, получился слишком длинный список. Покажу в следующий раз. Перезапусти программу "бот"')
+        for longlist_event in longpoll.listen():
+                      write_msg(longlist_event.user_id, 'К сожалению, получился слишком длинный список. Покажу в следующий раз. Перезапусти программу "бот"')
                       sys.exit()
         print('ошибка ApiError "слишком длинное сообщение"' )
     else:
         return
 url = 'https://api.vk.com/method/'
-
-
-
 bot_params = {
     'access_token': user_token,
     'v': V
 }
-
 class Bot:
-
     url = 'https://api.vk.com/method/'
     def __init__(self):
         self.token = user_token
@@ -44,7 +39,6 @@ class Bot:
             'access_token': self.token,
             'v': self.version
         }
-
     @staticmethod
     def sex_persone():
         user_info_url = url + 'users.get'
@@ -172,32 +166,59 @@ class Bot:
         except Exception as err:
             print(f'Другая ошибка: {err}')
 
-
     @staticmethod
     def relat_persone():
+        global data_relation
         user_info_url = url + 'users.get'
         user_params = {
             'user_ids': user_id,
             'fields': 'relation'
         }
         resp = requests.get(user_info_url, params={**bot_params, **user_params})
-        time.sleep(0.4)
+        time.sleep(0.5)
         response = resp.json()
         print('relat',response)
         try:
             response_list = response['response']
+            print('response_list',response_list)
             for i in response_list:
-                print(i.get('relation'))
-                date_relation = i.get('relation')
-                return date_relation
+                print('i.get(relation)', i.get('relation'))
+                if i.get('relation') != 0:
+                    data_relation = i.get('relation')
+                    return data_relation
+                    pass
+                else:
+                    pass
+
         except KeyError:
             print(KeyError)
             pass
         else:
-            pass
+            write_msg(user_id,
+                      'Выбери семейное положение кандидата:\n1 - не женат(не замужем);'
+                      '\n2 - встречается;\n3 - помолвлен(-а); \n4 - женат (замужем); \n5 - всё сложно;'
+                      '\n6 - в активном поиске; \n7 - влюблен(-а); \n8 - в гражданском браке.'
+                      )
+            while True:
+                for event in longpoll.listen():
+                    if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+                        request = event.text.lower()
+                        try:
+                            data_relation = int(request)
+                            if 0 < int(request) < 9:
+                                print('выбрано',data_relation )
+                                return data_relation
+                                pass
+                            else:
+                                write_msg(event.user_id, 'Введена неправильная цифра, надо выбрать от 1 до 8')
+                                break
+                        except ValueError:
+                            write_msg(event.user_id, 'Неправильный ввод, надо  выбрать ЦИФРУ от 1 до 8')
+                            print('ошибка ввода цифры')
+                            break
 
     @staticmethod
-    def home_town ():
+    def home_town_persone ():
         user_info_url = url + 'users.get'
         user_params = {
             'user_ids': user_id,
@@ -206,32 +227,38 @@ class Bot:
         resp = requests.get(user_info_url, params={**bot_params, **user_params})
         time.sleep(0.4)
         response = resp.json()
-        print('home_town',response)
+        print('response',response)
         try:
             response_list = response['response']
+            print('response_list',response_list)
+            response_dict = response_list[0]
+            print('response_dict', response_dict)
             for i in response_list:
-                print(i.get('home_town'))
-                home_town = i.get('home_town')
-                return home_town
-            else:
-                write_msg(user_id,'Введите название своего города')
-                for event in longpoll.listen():
-                    if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                        request = event.text()
-                        try:
-                            home_town = str(request)
-                            pass
-                        except Exception:
-                            print(TypeError)
-                            break
-                        else:
-                            return home_town
+                if 'home_town' in response_dict.keys() and response_dict['home_town'] !='':
+                    print(i.get('home_town'))
+                    home_town = i.get('home_town')
+                    print('i.get(home_town)',home_town)
+                    return home_town
+                    pass
+                else:
+                    write_msg(user_id,'Введите название своего города')
+                    for event in longpoll.listen():
+                        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+                            request = event.text.lower()
+                            print('request',request)
+                            try:
+                                home_town = request
+                                return home_town
+                                pass
+                            except Exception:
+                                print(TypeError)
+                                break
+
         except KeyError:
             print(KeyError)
             pass
         else:
             pass
-
 Bot()
 
 if __name__ == '__main__':
@@ -254,24 +281,21 @@ if __name__ == '__main__':
                                 write_msg(event.user_id, 'Нужно написать "да" или "нет"')
                                 break
                             elif request == 'да':
-                                Bot.sex_persone()
                                 sex = Bot.sex_persone()
-                                Bot.age_from_persone()
                                 age_from = Bot.age_from_persone()
-                                print(f'Диапазон поиска составит от {Bot.age_from_persone()}')
-                                Bot.age_to_persone()
+                                print(f'Диапазон поиска составит от {age_from}')
                                 age_to = Bot.age_to_persone()
-                                print(f'до {Bot.age_to_persone()} лет')
-                                Bot.relat_persone()
-                                print(f'Семейное положение: {Bot.relat_persone()}')
-                                relation = Bot.relat_persone()
-                                Bot.home_town()
-                                print(f'{Bot.home_town()}')
-                                home_town = Bot.home_town()
+                                print(f'до {age_to} лет')
+                                relation = int(Bot.relat_persone())
+                                print('relation', relation)
+                                home_town = Bot.home_town_persone()
+                                print(f'Bot home_town, {home_town}')
                                 write_msg(event.user_id, 'Результаты поиска')
                                 vk_client = Handler(bot_token, V)
                                 get_user_info = vk_client.get_user_info(event.user_id)
                                 print(f'get_user_info, {get_user_info}')
+                                get_persone_info = vk_client.get_persone_info(event.user_id)
+                                print(f'get_persone_info, {get_persone_info}')
                                 users_search = vk_client.users_search(get_user_info, sex, age_from, age_to, relation, home_town)
                                 print(f'users_search, {users_search}')
                                 persones_list = []
@@ -300,6 +324,7 @@ if __name__ == '__main__':
                                         for item in add_result:
                                             name = item.name
                                             persones_list.append(name)
+                                            print(persones_list)
                                         write_msg(event.user_id, 'Продолжаем искать?')
                                         for event in longpoll.listen():
                                             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
@@ -326,10 +351,3 @@ if __name__ == '__main__':
                                                                     event.user_id,
                                                                     f'Продолжаем поиск по тем же критериям?')
                                                                 break
-
-
-
-
-
-
-

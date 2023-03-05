@@ -35,13 +35,12 @@ class Handler:
                 print(f'Другая ошибка: {err}')
             else:
                 print('Успешное соединение get_user')
-        # print(respJS)
         return respJS
 
-    def users_search(self, get_user_info, sex, age_from, age_to, relation, home_town):
+    def users_search(self, get_persone_info, sex, age_from, age_to, relation, home_town):
         persone_id_list = []
         while True:
-            for items in get_user_info['response']:
+            for items in get_persone_info['response']:
                 users_search_url = self.url + 'users.search'
                 user_params = {
                     'count': 20,
@@ -69,14 +68,14 @@ class Handler:
                     print(
                         'Успешное соединение user_search')
                 persone_id_list = [item.get('id') for item in response['response']['items']]
-                print(persone_id_list)
+                print('persone_id_list', persone_id_list)
             return persone_id_list
 
     def get_persone_info(self, persone_id):
         user_info_url = self.url + 'users.get'
         user_params = {
             'user_ids': persone_id,
-            'fields': 'sex, bdate, relation, city, home_town',
+            'fields': 'sex, bdate, relation, home_town',
             'name_case': 'nom'
         }
         response = requests.get(user_info_url, params={**self.params, **user_params}).json()
@@ -90,7 +89,7 @@ class Handler:
                 print(f'Другая ошибка: {err}')
             else:
                 print('Успешное соединение')
-        # print(response)
+        print('get_persone_info',response)
         return response
 
     def get_photos(self, persone_id):
@@ -109,7 +108,7 @@ class Handler:
             best_photo_list = []
             for value in response.values():
                 items = value.get('items')
-                print(items)
+                print('items get_photos',items)
                 for item in items:
                     like_id_list = []
                     likes = item.get('likes')
@@ -125,7 +124,7 @@ class Handler:
                     photo_list.append(like_id_list)
                     photo_list.append(comment_id_list)
             photo_list.sort()
-            print(photo_list)
+            print('photo_list',photo_list)
             if len(photo_list) >= 3:
                 best_photo_list.append(photo_list[-1])
                 best_photo_list.append(photo_list[-2])
@@ -135,7 +134,7 @@ class Handler:
                 best_photo_list.append(photo_list[-2])
             else:
                 best_photo_list.append(photo_list[-1])
-            print(best_photo_list)
+            print('best_photo_list',best_photo_list)
         except TypeError:
             print('ошибка TypeError в модуле get_photos')
             pass
@@ -162,6 +161,3 @@ class Handler:
             pass
         else:
             return attachments
-
-
-
